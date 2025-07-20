@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SmartCareerPlatform.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -33,7 +34,16 @@ namespace SmartCareerPlatform.Services
 
         public User? GetProfile(string? username)
         {
-            return _context.Users.FirstOrDefault(u => u.Username == username);
+            return _context.Users
+                .Include(u => u.Skills)
+                .FirstOrDefault(u => u.Username == username);
+        }
+
+        public async Task<User?> GetUserByIdAsync(int userId)
+        {
+            return await _context.Users
+                .Include(u => u.Skills)
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
 
         public bool UpdateProfile(User user)

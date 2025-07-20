@@ -85,7 +85,8 @@ export const userAPI = {
   
   getProgress: () => apiClient.get('/user/progress'),
   
-
+  updateProgress: (courseId: number, percentage: number) =>
+    apiClient.put('/user/progress', { courseId, percentage }),
 };
 
 export const courseAPI = {

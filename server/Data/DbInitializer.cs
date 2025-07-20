@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-using SmartCareerPlatform.Server.Data; // Add this if ApplicationDbContext is in this namespace
+using SmartCareerPlatform.Server.Data; 
 
 namespace SmartCareerPlatform.Server.Data
 {

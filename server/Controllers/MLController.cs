@@ -9,30 +9,35 @@ namespace SmartCareerPlatform.Controllers
     public class MLController : ControllerBase
     {
         private readonly IMLService _mlService;
+        private readonly IAuthService _authService;
 
-        public MLController(IMLService mlService)
+        public MLController(IMLService mlService, IAuthService authService)
         {
             _mlService = mlService;
+            _authService = authService;
         }
 
-        [HttpPost("career-predict")]
-        public IActionResult PredictCareer([FromBody] CareerPredictionRequest request)
+        [HttpPost("predict-career")]
+        public async Task<IActionResult> PredictCareer([FromBody] CareerPredictionRequest request)
         {
-            var result = _mlService.PredictCareer(request);
+            var result = await _mlService.PredictCareerAsync(request);
             return Ok(result);
         }
 
-        [HttpPost("course-recommend")]
-        public IActionResult RecommendCourses([FromBody] CourseRecommendationRequest request)
+        [HttpPost("predict-career/user/{userId}")]
+        public async Task<IActionResult> PredictCareerForUser(int userId)
         {
-            var result = _mlService.RecommendCourses(request);
-            return Ok(result);
-        }
+            var user = await _authService.GetUserByIdAsync(userId);
+            if (user == null) return NotFound();
 
-        [HttpPost("skill-gap")]
-        public IActionResult AnalyzeSkillGap([FromBody] SkillGapAnalysisRequest request)
-        {
-            var result = _mlService.AnalyzeSkillGap(request);
+            var request = new CareerPredictionRequest
+            {
+                Skills = user.Skills.Select(s => s.Name).ToList(),
+                Interests = user.Interests,
+                Experience = user.Experience
+            };
+
+            var result = await _mlService.PredictCareerAsync(request);
             return Ok(result);
         }
     }

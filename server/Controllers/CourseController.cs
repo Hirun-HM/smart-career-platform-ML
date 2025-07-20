@@ -18,17 +18,27 @@ namespace SmartCareerPlatform.Controllers
         [HttpGet("recommend")]
         public IActionResult GetRecommendations([FromQuery] int userId)
         {
-            var courses = _courseService.GetRecommendedCourses(userId);
+            if (userId <= 0)
+                return BadRequest("Invalid user ID.");
+                
+            var courses = _courseService.GetRecommendedCoursesAsync(userId);
             return Ok(courses);
         }
 
         [HttpPost("enroll")]
-        public IActionResult EnrollCourse([FromBody] int courseId)
+        public async Task<IActionResult> EnrollCourse([FromBody] EnrollmentRequest request)
         {
-            var result = _courseService.EnrollCourse(courseId);
+            var result = await _courseService.EnrollCourseAsync(request.CourseId);
             if (!result)
                 return BadRequest("Enrollment failed.");
-            return Ok("Enrolled successfully.");
+                
+            return Ok(new { Message = "Enrolled successfully." });
         }
+    }
+
+    public class EnrollmentRequest
+    {
+        public int CourseId { get; set; }
+       
     }
 }

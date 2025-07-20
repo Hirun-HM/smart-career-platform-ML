@@ -15,7 +15,7 @@ public class Course
     
     public List<string> Skills { get; set; } = new();
     
-    public int Duration { get; set; } // in hours
+    public int Duration { get; set; } 
     
     public decimal Rating { get; set; } = 0;
     
@@ -23,12 +23,13 @@ public class Course
     
     public string Category { get; set; } = string.Empty;
     
-    public string Level { get; set; } = string.Empty; // Beginner, Intermediate, Advanced
+    public string Level { get; set; } = string.Empty; 
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-    // Navigation properties
+  
     public List<UserCourse> UserCourses { get; set; } = new();
+    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }
 
 public class UserCourse
@@ -38,7 +39,7 @@ public class UserCourse
     public int CourseId { get; set; }
     public DateTime EnrolledAt { get; set; } = DateTime.UtcNow;
     public DateTime? CompletedAt { get; set; }
-    public int Progress { get; set; } = 0; // 0-100
+    public int Progress { get; set; } = 0; 
     
     // Navigation properties
     public User User { get; set; } = null!;

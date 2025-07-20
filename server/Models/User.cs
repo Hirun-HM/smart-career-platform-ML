@@ -36,4 +36,5 @@ public class User
     public List<UserCourse> UserCourses { get; set; } = new();
     // public List<UserProgress> UserProgress { get; set; } = new();
     public List<Skill> Skills { get; set; } = new();
+    public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }

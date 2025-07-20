@@ -29,9 +29,9 @@ builder.Services.AddJwtAuthentication(jwtKey, jwtIssuer);
 
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IMLService, MLService>();
-builder.Services.AddScoped<CourseService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
+builder.Services.AddScoped<IMLService, MLService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 // CORS
 builder.Services.AddCors(options =>

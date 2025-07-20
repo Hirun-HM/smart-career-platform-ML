@@ -4,8 +4,9 @@ namespace SmartCareerPlatform.Services
 {
     public interface IMLService
     {
-        CareerPredictionResponse PredictCareer(CareerPredictionRequest request);
-        List<CourseRecommendationResponse> RecommendCourses(CourseRecommendationRequest request);
-        SkillGapAnalysisResponse AnalyzeSkillGap(SkillGapAnalysisRequest request);
+        Task<CareerPredictionResponse> PredictCareerAsync(CareerPredictionRequest request);
+        Task<List<CourseRecommendationResponse>> RecommendCoursesAsync(CourseRecommendationRequest request);
+        Task<SkillGapAnalysisResponse> AnalyzeSkillGapAsync(SkillGapAnalysisRequest request);
+        Task<LearningPathResponse> GenerateLearningPathAsync(int userId, string targetCareer);
     }
 }

@@ -17,7 +17,7 @@ export default function CareerPathComponent({ careerPath, user }: CareerPathProp
         setSkillGap(response.data);
       } catch (error) {
         console.error('Error fetching skill gap:', error);
-        // Set mock data for demo
+        
         setSkillGap({
           missingSkills: ['Machine Learning', 'Data Analysis', 'Python'],
           roadmap: [

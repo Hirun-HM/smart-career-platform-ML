@@ -8,5 +8,7 @@ namespace SmartCareerPlatform.Services
         bool Register(User user);
         User? GetProfile(string? username);
         bool UpdateProfile(User user);
+        Task<User?> GetUserByIdAsync(int userId); 
+        string GenerateJwtToken(User user, string jwtKey, string jwtIssuer);
     }
 }
