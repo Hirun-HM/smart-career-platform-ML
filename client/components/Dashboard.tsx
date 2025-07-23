@@ -174,11 +174,14 @@ export default function Dashboard({ user }: DashboardProps) {
 
           {activeTab === 'career' && careerPrediction && (
             <CareerPathComponent careerPath={careerPrediction} user={user} />
-          )}
-
-          {activeTab === 'courses' && (
-            <CourseRecommendations courses={recommendations} />
-          )}
+          )}            {activeTab === 'courses' && (
+              <CourseRecommendations 
+                userId={user.id}
+                userSkills={user.skills.map(skill => skill.name)}
+                targetSkills={user.interests}
+                maxRecommendations={12}
+              />
+            )}
 
           {activeTab === 'skills' && (
             <SkillAssessment user={user} />

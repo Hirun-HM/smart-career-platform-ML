@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SmartCareerPlatform.Models;
+using SmartCareerPlatform.Repository;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -10,50 +11,48 @@ namespace SmartCareerPlatform.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUserRepository _userRepository;
 
-        public AuthService(ApplicationDbContext context)
+        public AuthService(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
 
         public string? Authenticate(User user)
         {
-            var found = _context.Users.FirstOrDefault(u => u.Username == user.Username && u.PasswordHash == user.PasswordHash);
-            return found != null ? "mock-token" : null;
+            // For demo: use repository to get user by email or username
+            var found = _userRepository.GetUserByEmailAsync(user.Email).Result;
+            return found != null && found.PasswordHash == user.PasswordHash ? "mock-token" : null;
         }
 
         public bool Register(User user)
         {
-            if (_context.Users.Any(u => u.Username == user.Username || u.Email == user.Email))
+            var existing = _userRepository.GetUserByEmailAsync(user.Email).Result;
+            if (existing != null)
                 return false;
-            _context.Users.Add(user);
-            _context.SaveChanges();
+            _userRepository.AddUserAsync(user).Wait();
             return true;
         }
 
         public User? GetProfile(string? username)
         {
-            return _context.Users
-                .Include(u => u.Skills)
-                .FirstOrDefault(u => u.Username == username);
+            // For demo: not async, but should be
+            return _userRepository.GetAllUsersAsync().Result.FirstOrDefault(u => u.Username == username);
         }
 
         public async Task<User?> GetUserByIdAsync(int userId)
         {
-            return await _context.Users
-                .Include(u => u.Skills)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            return await _userRepository.GetUserByIdAsync(userId);
         }
 
         public bool UpdateProfile(User user)
         {
-            var existing = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+            var existing = _userRepository.GetUserByIdAsync(user.Id).Result;
             if (existing == null) return false;
             existing.Email = user.Email;
             existing.Experience = user.Experience;
             existing.Username = user.Username;
-            _context.SaveChanges();
+            _userRepository.UpdateUserAsync(existing).Wait();
             return true;
         }
 

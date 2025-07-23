@@ -8,6 +8,7 @@ using System.Text;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
 using SmartCareerPlatform.Server.Data;
 using SmartCareerPlatform.Config;
+using SmartCareerPlatform.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +31,15 @@ builder.Services.AddJwtAuthentication(jwtKey, jwtIssuer);
 // Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
-builder.Services.AddScoped<IMLService, MLService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ICourseRecommendationService, CourseRecommendationService>();
+builder.Services.AddScoped<CourseraApiService>();
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+builder.Services.AddScoped<IUserCourseInteractionRepository, UserCourseInteractionRepository>();
+builder.Services.AddScoped<ISkillRepository, SkillRepository>();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -58,8 +66,8 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Database.EnsureCreated();
+    await context.Database.EnsureCreatedAsync();
     DbInitializer.Initialize(context);
 }
 
-app.Run();
+await app.RunAsync();

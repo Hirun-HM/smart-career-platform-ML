@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SmartCareerPlatform.Data;
 using SmartCareerPlatform.Models;
+using SmartCareerPlatform.Services;
 
 namespace SmartCareerPlatform
 {
@@ -14,7 +15,10 @@ namespace SmartCareerPlatform
         public DbSet<User> Users { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Skill> Skills { get; set; }
-        public DbSet<Enrollment> Enrollments { get; set; } 
+        public DbSet<Enrollment> Enrollments { get; set; }
+      
+        public DbSet<UserCourseInteraction> UserCourseInteractions { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,10 +35,10 @@ namespace SmartCareerPlatform
                         j.ToTable("UserSkills");
                     });
 
-          
+
             SkillSeeder.SeedSkills(modelBuilder);
 
-        
+
             modelBuilder.Entity<Enrollment>()
                 .HasOne(e => e.Course)
                 .WithMany(c => c.Enrollments)
@@ -45,7 +49,7 @@ namespace SmartCareerPlatform
                 .WithMany(u => u.Enrollments)
                 .HasForeignKey(e => e.UserId);
 
-           
+
             modelBuilder.Entity<Enrollment>()
                 .HasIndex(e => new { e.UserId, e.CourseId })
                 .IsUnique();

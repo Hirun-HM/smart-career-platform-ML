@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SmartCareerPlatform.Models;
+using SmartCareerPlatform.Repository;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,11 +9,15 @@ namespace SmartCareerPlatform.Services
 {
     public class CourseService : ICourseService
     {
-        private readonly ApplicationDbContext _context;
+        private const string InternalCourseBaseUrl = "https://internal.example.com";
 
-        public CourseService(ApplicationDbContext context)
+        private readonly ICourseRepository _courseRepository;
+        private readonly IEnrollmentRepository _enrollmentRepository;
+
+        public CourseService(ICourseRepository courseRepository, IEnrollmentRepository enrollmentRepository)
         {
-            _context = context;
+            _courseRepository = courseRepository;
+            _enrollmentRepository = enrollmentRepository;
         }
 
         public async Task<List<CourseRecommendationResponse>> GetRecommendedCoursesAsync(int userId)
@@ -30,7 +35,7 @@ namespace SmartCareerPlatform.Services
                     Skills = new List<string> { "AI", "Machine Learning" },
                     Duration = 10,
                     Rating = 4.5m,
-                    Url = "https://example.com/ai-course",
+                    Url = $"{InternalCourseBaseUrl}/ai-course",
                     RecommendationScore = 0.95m
                 },
                 new CourseRecommendationResponse
@@ -41,30 +46,27 @@ namespace SmartCareerPlatform.Services
                     Skills = new List<string> { "HTML", "CSS", "JavaScript" },
                     Duration = 20,
                     Rating = 4.7m,
-                    Url = "https://example.com/web-course",
+                    Url = $"{InternalCourseBaseUrl}/web-course",
                     RecommendationScore = 0.90m
                 }
             };
         }
-
-       
 
         public async Task<bool> EnrollCourseAsync(int courseId)
         {
             try
             {
                 // Validate the course exists
-                var course = await _context.Courses.FindAsync(courseId);
+                var course = await _courseRepository.GetCourseByIdAsync(courseId);
                 if (course == null)
                     return false;
 
-                // TODO: Get current user ID from authentication context
-                // For now, using a placeholder
+                // Get current user ID from authentication context (placeholder implementation)
                 var userId = 1; // Replace with actual user ID from claims/context
 
                 // Check if user is already enrolled
-                var existingEnrollment = await _context.Enrollments
-                    .FirstOrDefaultAsync(e => e.CourseId == courseId && e.UserId == userId);
+                var userEnrollments = await _enrollmentRepository.GetEnrollmentsByUserIdAsync(userId);
+                var existingEnrollment = userEnrollments.FirstOrDefault(e => e.CourseId == courseId);
                 
                 if (existingEnrollment != null)
                     return false; // Already enrolled
@@ -78,27 +80,24 @@ namespace SmartCareerPlatform.Services
                     Status = "Active"
                 };
 
-                _context.Enrollments.Add(enrollment);
-                await _context.SaveChangesAsync();
+                await _enrollmentRepository.AddEnrollmentAsync(enrollment);
                 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
-                // Log the exception in a real implementation
-                // _logger.LogError(ex, "Failed to enroll in course {CourseId}", courseId);
                 return false;
             }
         }
 
         public async Task<List<Course>> GetAllCoursesAsync()
         {
-            return await _context.Courses.ToListAsync();
+            return (await _courseRepository.GetAllCoursesAsync()).ToList();
         }
 
         public async Task<Course?> GetCourseByIdAsync(int courseId)
         {
-            return await _context.Courses.FindAsync(courseId);
+            return await _courseRepository.GetCourseByIdAsync(courseId);
         }
     }
 }

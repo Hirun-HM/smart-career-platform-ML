@@ -18,25 +18,9 @@ namespace SmartCareerPlatform.Models
         public decimal Confidence { get; set; }
     }
 
-    public class CourseRecommendationRequest
-    {
-        public int UserId { get; set; }
-        public List<string> Skills { get; set; } = new();
-        public List<string> Interests { get; set; } = new();
-        public string? TargetCareer { get; set; }
-    }
+    
 
-    public class CourseRecommendationResponse
-    {
-        public int Id { get; set; }
-        public string Title { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public List<string> Skills { get; set; } = new();
-        public int Duration { get; set; }
-        public decimal Rating { get; set; }
-        public string Url { get; set; } = string.Empty;
-        public decimal RecommendationScore { get; set; }
-    }
+    
 
     public class SkillGapAnalysisRequest
     {

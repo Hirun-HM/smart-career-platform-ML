@@ -9,7 +9,6 @@ public class Enrollment
     public DateTime EnrollmentDate { get; set; }
     public string Status { get; set; } = "Active";
 
-  
-    public Course Course { get; set; }
-    public User User { get; set; }
+    public Course Course { get; set; } = null!;
+    public User User { get; set; } = null!;
 }

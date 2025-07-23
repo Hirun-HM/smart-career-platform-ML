@@ -25,7 +25,7 @@ namespace SmartCareerPlatform.Controllers
         }
 
         [HttpGet("progress")]
-        public async Task<IActionResult> GetProgress()
+        public IActionResult GetProgress()
         {
             // Mock progress data
             var progress = new

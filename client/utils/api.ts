@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-const ML_BASE_URL = process.env.NEXT_PUBLIC_ML_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5002/api';
+const ML_BASE_URL = process.env.NEXT_PUBLIC_ML_URL || 'http://localhost:5001';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -39,7 +39,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  skills: Skill[]; // Update to use Skill objects instead of strings
+  skills: Skill[]; 
   interests: string[];
   experience: number;
 }

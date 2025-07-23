@@ -23,11 +23,18 @@ public class Course
     
     public string Category { get; set; } = string.Empty;
     
-    public string Level { get; set; } = string.Empty; 
+    public string Level { get; set; } = string.Empty;
+    
+    // Add these properties for external courses
+    public string Instructor { get; set; } = string.Empty;
+    public decimal Price { get; set; } = 0;
+    public bool IsActive { get; set; } = true;
+    public string Provider { get; set; } = "Internal"; // "Internal", "Coursera", etc.
+    public string ExternalId { get; set; } = string.Empty; // For Coursera course ID
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     
-  
+    // Navigation properties
     public List<UserCourse> UserCourses { get; set; } = new();
     public ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }
