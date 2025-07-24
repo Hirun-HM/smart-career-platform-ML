@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { courseAPI } from '../utils/api';
+import { courseAPI, Course } from '../utils/api';
 
 interface CourseRecommendation {
   id: number;
@@ -27,13 +27,15 @@ interface CourseRecommendationsProps {
   readonly userSkills?: readonly string[];
   readonly targetSkills?: readonly string[];
   readonly maxRecommendations?: number;
+  readonly initialCourses?: Course[];
 }
 
 export default function CourseRecommendations({ 
   userId, 
   userSkills = [], 
   targetSkills = [],
-  maxRecommendations = 12 
+  maxRecommendations = 12,
+  initialCourses = []
 }: CourseRecommendationsProps) {
   const [recommendations, setRecommendations] = useState<CourseRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,21 +44,81 @@ export default function CourseRecommendations({
   const [interactionLoading, setInteractionLoading] = useState<number[]>([]);
 
   useEffect(() => {
-    fetchRecommendations();
-  }, [userId, userSkills, targetSkills]);
+    if (initialCourses.length > 0) {
+      // Transform the initial courses to match the recommendation interface
+      console.log('CourseRecommendations: Using initial courses:', initialCourses.length);
+      const transformedCourses = initialCourses.map((course: any) => ({
+        ...course,
+        recommendationScore: 0.85, // Default good score
+        recommendationReason: "Recommended based on your profile and trending courses",
+        matchingSkills: course.skills.filter((skill: string) => 
+          userSkills.some(userSkill => userSkill.toLowerCase().includes(skill.toLowerCase()))
+        ),
+        newSkillsToLearn: course.skills.filter((skill: string) => 
+          !userSkills.some(userSkill => userSkill.toLowerCase().includes(skill.toLowerCase()))
+        ),
+        isExternal: true
+      }));
+      setRecommendations(transformedCourses);
+      setLoading(false);
+    } else {
+      // Fallback to the original API call
+      fetchRecommendations();
+    }
+  }, [userId, userSkills, targetSkills, initialCourses]);
 
   const fetchRecommendations = async () => {
     if (!userId) return;
     
     setLoading(true);
     try {
-      const response = await fetch(`/api/course-recommendations/user/${userId}`);
+      // Try to get AI recommendations first
+      const response = await fetch(`http://localhost:5002/api/course-recommendations/user/${userId}`);
       if (response.ok) {
         const data = await response.json();
         setRecommendations(data.recommendations || []);
+      } else {
+        // Fallback to getting all courses if recommendations aren't available
+        console.log('AI recommendations not available, fetching all courses...');
+        const coursesResponse = await fetch('http://localhost:5002/api/courses');
+        if (coursesResponse.ok) {
+          const courses = await coursesResponse.json();
+          // Transform regular courses to match the recommendation interface
+          const transformedCourses = courses.map((course: any) => ({
+            ...course,
+            recommendationScore: 0.75, // Default score
+            recommendationReason: "Recommended based on your interests and skill level",
+            matchingSkills: course.skills.filter((skill: string) => 
+              userSkills.includes(skill.toLowerCase())
+            ),
+            newSkillsToLearn: course.skills.filter((skill: string) => 
+              !userSkills.includes(skill.toLowerCase())
+            ),
+            isExternal: true
+          }));
+          setRecommendations(transformedCourses);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch recommendations:', error);
+      // Final fallback - get all courses
+      try {
+        const coursesResponse = await fetch('http://localhost:5002/api/courses');
+        if (coursesResponse.ok) {
+          const courses = await coursesResponse.json();
+          const transformedCourses = courses.map((course: any) => ({
+            ...course,
+            recommendationScore: 0.75,
+            recommendationReason: "Popular course in your field",
+            matchingSkills: [],
+            newSkillsToLearn: course.skills || [],
+            isExternal: true
+          }));
+          setRecommendations(transformedCourses);
+        }
+      } catch (fallbackError) {
+        console.error('Fallback course fetch failed:', fallbackError);
+      }
     } finally {
       setLoading(false);
     }

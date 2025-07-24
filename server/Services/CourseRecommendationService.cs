@@ -388,7 +388,7 @@ namespace SmartCareerPlatform.Services
                 foreach (var courseData in allCourses)
                 {
                     var existingCourse = (await _courseRepository.GetAllCoursesAsync())
-                        .FirstOrDefault(c => c.ExternalId == courseData.Id.ToString() && c.Provider == CourseraProvider);
+                        .FirstOrDefault(c => c.Title == courseData.Title && c.Provider == CourseraProvider);
 
                     if (existingCourse == null)
                     {
@@ -402,7 +402,6 @@ namespace SmartCareerPlatform.Services
                             Category = courseData.Category,
                             Level = courseData.Level,
                             Provider = CourseraProvider,
-                            ExternalId = courseData.Id.ToString(),
                             IsActive = true,
                             Url = $"https://www.coursera.org/learn/{courseData.Id}",
                             CreatedAt = DateTime.UtcNow

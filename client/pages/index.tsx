@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
@@ -27,6 +27,14 @@ export default function Home() {
   ]);
 
   const router = useRouter();
+
+  // Check if user is logged in and redirect to dashboard
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.push('/dashboard');
+    }
+  }, [router]);
 
   const handleProfileLog = () => {
     router.push('/profile');

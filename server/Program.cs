@@ -29,6 +29,7 @@ var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "your_app";
 builder.Services.AddJwtAuthentication(jwtKey, jwtIssuer);
 
 // Services
+builder.Services.AddMemoryCache(); // Add memory cache for caching services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ISkillService, SkillService>();
 builder.Services.AddScoped<ICourseService, CourseService>();

@@ -21,9 +21,16 @@ export default function Login() {
       });
       console.log('Login response:', response);
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('username', credentials.username);
       console.log('Token stored in localStorage:', response.data.token);
-      router.push('/');
-      console.log('Navigated to home page');
+      console.log('Username stored in localStorage:', credentials.username);
+      
+      // Add a small delay to ensure token is stored
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Force navigation with window.location instead of router.push
+      window.location.href = '/dashboard';
+      console.log('Navigated to dashboard page');
     } catch (err: any) {
       console.log('Login error:', err);
       setError(err.response?.data?.message || 'Login failed');

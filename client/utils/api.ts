@@ -52,6 +52,13 @@ export interface Course {
   duration: number;
   rating: number;
   url: string;
+  category: string;
+  level: string;
+  instructor: string;
+  price: number;
+  isActive: boolean;
+  provider: string;
+  createdAt: string;
 }
 
 export interface CareerPath {

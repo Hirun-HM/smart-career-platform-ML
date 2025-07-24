@@ -30,7 +30,6 @@ public class Course
     public decimal Price { get; set; } = 0;
     public bool IsActive { get; set; } = true;
     public string Provider { get; set; } = "Internal"; // "Internal", "Coursera", etc.
-    public string ExternalId { get; set; } = string.Empty; // For Coursera course ID
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     

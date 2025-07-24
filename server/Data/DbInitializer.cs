@@ -1,5 +1,6 @@
 using SmartCareerPlatform;
 using SmartCareerPlatform.Models;
+using SmartCareerPlatform.Data;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -23,13 +24,8 @@ namespace SmartCareerPlatform.Server.Data
                 context.SaveChanges();
             }
 
-            
-            if (!context.Courses.Any())
-            {
-                context.Courses.Add(new Course { Title = "Introduction to AI", Description = "Learn the basics of Artificial Intelligence.", Duration = 10 });
-                context.Courses.Add(new Course { Title = "Web Development Bootcamp", Description = "Become a full-stack web developer.", Duration = 20 });
-                context.SaveChanges();
-            }
+            // Seed courses using the CourseSeeder
+            CourseSeeder.SeedCourses(context);
 
            
             if (!context.Skills.Any())

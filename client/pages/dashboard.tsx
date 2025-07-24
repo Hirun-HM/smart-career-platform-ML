@@ -10,24 +10,24 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
+      console.log('Dashboard: Starting to fetch user data...');
       try {
         const token = localStorage.getItem('token');
+        console.log('Dashboard: Token found:', !!token);
         if (!token) {
+          console.log('Dashboard: No token, redirecting to login');
           router.push('/login');
           return;
         }
-
         
-        const username = localStorage.getItem('username');
-        if (!username) {
-          localStorage.removeItem('token');
-          router.push('/login');
-          return;
-        }
+        console.log('Dashboard: Calling getProfile API...');
         const response = await authAPI.getProfile();
+        console.log('Dashboard: Profile response:', response.data);
         setUser(response.data);
       } catch (error) {
+        console.log('Dashboard: Error fetching profile:', error);
         localStorage.removeItem('token');
+        localStorage.removeItem('username');
         router.push('/login');
       } finally {
         setLoading(false);

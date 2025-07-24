@@ -8,11 +8,27 @@ namespace SmartCareerPlatform.Controllers
     [Route("api/courses")]
     public class CourseController : ControllerBase
     {
-        private readonly CourseService _courseService;
+        private readonly ICourseService _courseService;
 
-        public CourseController(CourseService courseService)
+        public CourseController(ICourseService courseService)
         {
             _courseService = courseService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCourses()
+        {
+            var courses = await _courseService.GetAllCoursesAsync();
+            return Ok(courses);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetCourse(int id)
+        {
+            var course = await _courseService.GetCourseByIdAsync(id);
+            if (course == null)
+                return NotFound();
+            return Ok(course);
         }
 
         [HttpGet("recommend")]

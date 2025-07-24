@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, CareerPath, Course } from '../utils/api';
-import { mlAPI, courseAPI } from '../utils/api';
+import { User, CareerPath, Course, courseAPI } from '../utils/api';
 import CourseRecommendations from './CourseRecommendations';
 import SkillAssessment from './SkillAssessment';
 import ProgressTracker from './ProgressTracker';
@@ -19,19 +18,29 @@ export default function Dashboard({ user }: DashboardProps) {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Get career prediction
-        const careerResponse = await mlAPI.predictCareer({
-          skills: user.skills,
-          interests: user.interests,
-          experience: user.experience
-        });
-        setCareerPrediction(careerResponse.data);
-
-        // Get course recommendations
-        const courseResponse = await courseAPI.getRecommendations(user.id);
+        // Skip ML calls for now and just load basic courses
+        console.log('Dashboard: Loading basic data (skipping ML for now)...');
+        
+        // Get courses from backend instead of ML recommendations
+        const courseResponse = await courseAPI.getAll();
+        console.log('Dashboard: Courses fetched:', courseResponse.data.length);
         setRecommendations(courseResponse.data);
+        
+        // Set a default career prediction
+        setCareerPrediction({
+          id: 1,
+          title: 'Software Developer',
+          description: 'Based on your profile',
+          requiredSkills: [],
+          averageSalary: 75000,
+          growthRate: 15
+        });
+        
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
+        // Set empty data so page still loads
+        setRecommendations([]);
+        setCareerPrediction(null);
       } finally {
         setLoading(false);
       }
@@ -109,65 +118,79 @@ export default function Dashboard({ user }: DashboardProps) {
       <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           {activeTab === 'overview' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">🎯</span>
+            <div className="space-y-8">
+              {/* Stats Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">🎯</span>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt className="text-sm font-medium text-gray-500 truncate">
+                            Predicted Career
+                          </dt>
+                          <dd className="text-lg font-medium text-gray-900">
+                            {careerPrediction?.title || 'Loading...'}
+                          </dd>
+                        </dl>
+                      </div>
                     </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
-                          Predicted Career
-                        </dt>
-                        <dd className="text-lg font-medium text-gray-900">
-                          {careerPrediction?.title || 'Loading...'}
-                        </dd>
-                      </dl>
+                  </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">📚</span>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt className="text-sm font-medium text-gray-500 truncate">
+                            Available Courses
+                          </dt>
+                          <dd className="text-lg font-medium text-gray-900">
+                            {recommendations.length}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="p-5">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl">🛠️</span>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt className="text-sm font-medium text-gray-500 truncate">
+                            Current Skills
+                          </dt>
+                          <dd className="text-lg font-medium text-gray-900">
+                            {user.skills.length}
+                          </dd>
+                        </dl>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">📚</span>
-                    </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
-                          Recommended Courses
-                        </dt>
-                        <dd className="text-lg font-medium text-gray-900">
-                          {recommendations.length}
-                        </dd>
-                      </dl>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white overflow-hidden shadow rounded-lg">
-                <div className="p-5">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <span className="text-2xl">🛠️</span>
-                    </div>
-                    <div className="ml-5 w-0 flex-1">
-                      <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
-                          Current Skills
-                        </dt>
-                        <dd className="text-lg font-medium text-gray-900">
-                          {user.skills.length}
-                        </dd>
-                      </dl>
-                    </div>
-                  </div>
-                </div>
+              {/* Course Recommendations Section */}
+              <div>
+                <CourseRecommendations 
+                  userId={user.id}
+                  userSkills={user.skills.map(skill => skill.name)}
+                  targetSkills={user.interests}
+                  maxRecommendations={9}
+                  initialCourses={recommendations}
+                />
               </div>
             </div>
           )}
