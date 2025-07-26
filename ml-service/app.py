@@ -3,7 +3,7 @@ from flask_cors import CORS
 from course_recommendation_ml import CourseRecommendationML
 import logging
 
-# Set up logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

@@ -38,7 +38,7 @@ export default function Dashboard({ user }: DashboardProps) {
         
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-        // Set empty data so page still loads
+        
         setRecommendations([]);
         setCareerPrediction(null);
       } finally {
