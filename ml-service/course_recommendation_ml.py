@@ -13,7 +13,7 @@ import logging
 from typing import List, Dict, Any, Optional
 import os
 
-# Set up logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
